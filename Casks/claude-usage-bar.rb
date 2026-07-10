@@ -7,15 +7,23 @@ cask "claude-usage-bar" do
   # HOMEBREW_GITHUB_API_TOKEN — whichever the consumer already has). Downloading
   # a private release asset by its browser URL does not work; the API asset URL
   # with an octet-stream Accept header does.
-  url do
+  # `url do` blocks are deprecated in current Homebrew (no replacement), so compute
+  # the API asset URL in a method and pass it to a static `url`. Authenticate with
+  # Homebrew's built-in credential helper (keychain / gh / HOMEBREW_GITHUB_API_TOKEN).
+  # The API asset URL + "Accept: application/octet-stream" is required — a private
+  # release asset's browser download URL does not work.
+  def asset_url
     assets = GitHub.get_release("lig-sei-akihiro", "claude-usage-bar", "v#{version}").fetch("assets")
     asset  = assets.find { |a| a["name"] == "ClaudeUsageBar-#{version}.zip" }
     odie "release asset ClaudeUsageBar-#{version}.zip not found" unless asset
-    URL.new(asset.fetch("url"), using: :homebrew_curl, header: [
-      "Accept: application/octet-stream",
-      "Authorization: token #{GitHub::API.credentials}",
-    ])
+    asset.fetch("url")
   end
+
+  url asset_url,
+      header: [
+        "Accept: application/octet-stream",
+        "Authorization: bearer #{GitHub::API.credentials}",
+      ]
   name "Claude Usage Bar"
   desc "Menu bar app showing Claude Code usage across accounts"
   homepage "https://github.com/lig-sei-akihiro/claude-usage-bar"
