@@ -9,17 +9,20 @@ cask "claude-usage-bar" do
   # with an octet-stream Accept header does.
   url do
     assets = GitHub.get_release("lig-sei-akihiro", "claude-usage-bar", "v#{version}").fetch("assets")
-    asset  = assets.find { |a| a["name"] == "ClaudeUsageBar-#{version}.zip" }.fetch("url")
-    [asset, header: [
+    asset  = assets.find { |a| a["name"] == "ClaudeUsageBar-#{version}.zip" }
+    odie "release asset ClaudeUsageBar-#{version}.zip not found" unless asset
+    URL.new(asset.fetch("url"), using: :homebrew_curl, header: [
       "Accept: application/octet-stream",
-      "Authorization: bearer #{GitHub::API.credentials}",
-    ]]
+      "Authorization: token #{GitHub::API.credentials}",
+    ])
   end
   name "Claude Usage Bar"
   desc "Menu bar app showing Claude Code usage across accounts"
   homepage "https://github.com/lig-sei-akihiro/claude-usage-bar"
 
-  depends_on macos: ">= :sonoma" # Info.plist LSMinimumSystemVersion 14.0
+  # No `depends_on macos:` — the app's Info.plist (LSMinimumSystemVersion 14.0)
+  # enforces the minimum at launch, and the symbol/comparison forms are brittle on
+  # brand-new macOS releases.
 
   app "ClaudeUsageBar.app"
 
