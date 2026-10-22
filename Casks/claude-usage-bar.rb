@@ -1,6 +1,6 @@
 cask "claude-usage-bar" do
-  version "0.6.1"
-  sha256 "d7ea430b7d4e122b4f12bd56944a5fa1d76d9ae72fd27ddabf18ea24da2996d8"
+  version "0.6.2"
+  sha256 "4a095b698b9336d771140e12a29b2bb8751d5fd2e65feaae12eed7c60050c604"
 
   url "https://github.com/lig-sei-akihiro/claude-usage-bar/releases/download/v#{version}/ClaudeUsageBar-#{version}.zip",
       verified: "github.com/lig-sei-akihiro/claude-usage-bar/"
